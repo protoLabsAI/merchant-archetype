@@ -1,0 +1,78 @@
+# A protoAgent plugin BUNDLE (ADR 0040) — the Merchant archetype: an inventory and
+# selling assistant for anyone who buys in lots and sells piece by piece. The picker
+# id comes from protoAgent's catalog row `merchant`; the persona ships as its
+# `merchant` soul preset.
+#
+# Install (onto any host): python -m server plugin install <this-repo-url>
+# — or create a fleet member from it (README "Create an agent").
+#
+# NEVER POSTS. It drafts listings and records sales you confirm; it has no
+# marketplace write access, and it never messages a buyer.
+#
+# CORE FLOOR — protoAgent >= 0.148.0 (bundles carry no min-version, so stated here):
+#   * inventory declares `min_protoagent_version: 0.148.0`; the loader refuses it
+#     on older cores.
+#   * Printed QR labels open their item or bin in the console on core >= 0.227.0
+#     (sdk.view_url); older cores show a page naming the bin or item instead.
+#   * The `merchant` preset ships with the protoAgent PR adding the catalog row.
+#     Older cores without it fall back to the base persona.
+#
+# MODEL — deliberately unset: the agent uses the host's model connection. Scanning a
+# box in needs a vision-capable model.
+#
+# PIN LIFECYCLE (ADR 0049): external members are pinned to release TAGS; on core
+# >= 0.146 a pin is a FLOOR (newest COMPATIBLE tag, caret semantics; for 0.x the
+# minor is the boundary). Bump only to adopt an out-of-range release. The verify
+# workflow proves each pin set. Keep member entries on ONE line:
+# scripts/check_bundle_updates.py rewrites `ref:` in place.
+
+id: merchant-archetype
+name: Merchant
+# Bundle release version; protoAgent's bundle loader ignores it.
+version: 0.1.0
+description: >-
+  An inventory and selling assistant for resellers. Scan boxes in from your phone,
+  split them into pieces, label and bin them, price from sold comps with the evidence
+  kept, draft listings you post yourself, record sales and see profit per lot. Never
+  posts or messages anyone on its own.
+
+# The core version targeted by this pin set (ADR 0049): metadata, not enforced.
+verified_against: 0.229.0
+
+plugins:
+  - { id: inventory, url: https://github.com/protoLabsAI/inventory-plugin, ref: v0.16.2 }  # lots, pieces, bins + QR labels, scan intake, drafts, sales, P&L, the Inventory view
+  - { id: artifact, builtin: true }   # side-by-side price and profit comparisons
+  - { id: notes,    builtin: true }   # decisions and loose ends between sessions
+
+enabled: [inventory, artifact, notes]   # inventory ships disabled by author default
+
+# Create-time setup prompts (#2934, core >= 0.144.0). `help` renders on core >= 0.183.0.
+config_inputs:
+  - key: inventory.review_timezone
+    label: "Your timezone"
+    help: "Optional. An IANA name such as America/Los_Angeles, used for the weekly review's schedule. Blank uses UTC."
+    type: string
+  - key: inventory.weekly_review
+    label: "Weekly review"
+    help: "Re-checks stale prices and reports listings that have sat too long, every Monday morning. It never changes a listing. You can turn it on later in Settings."
+    type: boolean
+    default: false
+
+# No `config:` defaults beyond the prompts above. The member defaults are right for a
+# fresh agent: the database lives in the agent's own plugin store, label links work
+# out the agent's own address, and aging tiers start at 45 / 90 / 120 days.
+#
+# Not included on purpose: the ebay plugin (sold comps through a signed-in eBay
+# browser session). It is unlisted in protoAgent's catalog; prices here come from
+# what the agent can research and what the operator confirms. See README.
+
+# Agent archetype (ADR 0100): presents this bundle as "Merchant" once installed.
+# `soul_preset` gives a DIRECT `plugin install <url>` the persona on a host that
+# ships the preset. The catalog row, not this block, supplies picker id merchant.
+archetype:
+  label: Merchant
+  icon: Store
+  soul_preset: merchant
+  blurb: An inventory and selling assistant for resellers — scan boxes in from your phone, label and bin every piece, price with the evidence kept, draft listings you post yourself, and see profit per lot. Never posts on its own.
+  # Capability contract (ADR 0100): verify_bundle.py fails unless all of these tools bind.
+  requires_tools: [inventory_summary, inventory_upsert_item, inventory_set_price, inventory_mark_sold]
