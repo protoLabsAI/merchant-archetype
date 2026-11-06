@@ -83,7 +83,7 @@ jq -n --rawfile soul merchant.md '{
   name: "merchant",
   bundle: "https://github.com/protoLabsAI/merchant-archetype",
   soul: $soul,
-  requires_tools: ["inventory_summary", "inventory_upsert_item", "inventory_set_price", "inventory_mark_sold"]
+  requires_tools: ["inventory_summary", "inventory_list", "inventory_get", "inventory_upsert_lot", "inventory_upsert_item", "inventory_set_price", "inventory_mark_sold", "inventory_move_to_bin", "inventory_packing"]
 }' | curl -s -X POST http://127.0.0.1:7870/api/fleet \
       -H 'content-type: application/json' \
       ${PROTOAGENT_TOKEN:+-H "authorization: Bearer $PROTOAGENT_TOKEN"} \

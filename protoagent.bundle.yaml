@@ -75,4 +75,4 @@ archetype:
   soul_preset: merchant
   blurb: An inventory and selling assistant for resellers — scan boxes in from your phone, label and bin every piece, price with the evidence kept, draft listings you post yourself, and see profit per lot. Never posts on its own.
   # Capability contract (ADR 0100): verify_bundle.py fails unless all of these tools bind.
-  requires_tools: [inventory_summary, inventory_upsert_item, inventory_set_price, inventory_mark_sold]
+  requires_tools: [inventory_summary, inventory_list, inventory_get, inventory_upsert_lot, inventory_upsert_item, inventory_set_price, inventory_mark_sold, inventory_move_to_bin, inventory_packing]
