@@ -40,7 +40,7 @@ description: >-
 verified_against: 0.229.0
 
 plugins:
-  - { id: inventory, url: https://github.com/protoLabsAI/inventory-plugin, ref: v0.16.2 }  # lots, pieces, bins + QR labels, scan intake, drafts, sales, P&L, the Inventory view
+  - { id: inventory, url: https://github.com/protoLabsAI/inventory-plugin, ref: v0.17.0 }  # lots, pieces, bins + QR labels, scan intake, drafts, sales, P&L, the Inventory view
   - { id: artifact, builtin: true }   # side-by-side price and profit comparisons
   - { id: notes,    builtin: true }   # decisions and loose ends between sessions
 
